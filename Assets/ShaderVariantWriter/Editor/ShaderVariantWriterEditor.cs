@@ -64,24 +64,28 @@ public class ShaderVariantWriterEditor : Editor
         {
             foreach (Variant wantedVariant in settings.wantedVariants)
             {
-                try
+                foreach (string keywords in wantedVariant.keywords)
                 {
-                    ShaderVariantCollection.ShaderVariant variant =
-                        new ShaderVariantCollection.ShaderVariant(
-                            shader,
-                            wantedVariant.pass,
-                            wantedVariant.keywords.ToArray()
-                        );
+                    string [] keywordList = keywords.Split(new char [] {' '});
+                    try
+                    {
+                        ShaderVariantCollection.ShaderVariant variant =
+                            new ShaderVariantCollection.ShaderVariant(
+                                shader,
+                                wantedVariant.pass,
+                                keywordList
+                            );
 
-                    collection.Add(variant);
-                }
-                catch (System.ArgumentException)
-                {
-                    Debug.LogFormat(
-                        "Shader {0} pass {1} keywords {2} not found",
-                        shader.name,
-                        wantedVariant.pass.ToString(),
-                        string.Join(" ", wantedVariant.keywords));
+                        collection.Add(variant);
+                    }
+                    catch (System.ArgumentException)
+                    {
+                        Debug.LogFormat(
+                            "Shader {0} pass {1} keywords {2} not found",
+                            shader.name,
+                            wantedVariant.pass.ToString(),
+                            keywords);
+                    }
                 }
             }
         }
@@ -90,7 +94,7 @@ public class ShaderVariantWriterEditor : Editor
     void AddObjectShaders(GameObject gameObject, HashSet<Shader> shaders)
     {
         Renderer [] renderers = null;
-        renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+        renderers = gameObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in renderers)
         {
             Material [] materials = renderer.sharedMaterials;

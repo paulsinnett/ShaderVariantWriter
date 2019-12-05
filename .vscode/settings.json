@@ -52,5 +52,9 @@
         "ProjectSettings/":true,
         "temp/":true,
         "Temp/":true
-    }
+    },
+    "editor.wrappingIndent": "indent",
+    "editor.wordWrap": "on",
+    "editor.detectIndentation": false,
+    "omnisharp.useEditorFormattingSettings": false
 }
