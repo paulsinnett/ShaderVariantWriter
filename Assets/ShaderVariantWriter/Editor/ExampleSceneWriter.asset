@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: ExampleSceneWriter
   m_EditorClassIdentifier: 
   scene: {fileID: 102900000, guid: 0a7513e9282cc4f9d9c66b0c051e1b07, type: 3}
+  additionalHiddenShaders:
+  - Hidden/Internal-GUITexture
   additionalShaders:
   - {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
   - {fileID: 4800000, guid: 056454b44bd13a0478800d1855cb76de, type: 3}
+  - {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10757, guid: 0000000000000000f000000000000000, type: 0}
   additionalPrefabs:
   - {fileID: 4664626616656640470, guid: aba0a5d3aafd0fb45a9726d2a46bfdd0, type: 3}
   additionalMaterials:
@@ -23,10 +27,12 @@ MonoBehaviour:
   wantedVariants:
   - pass: 0
     keywords:
-    - FOG_LINEAR
+    - 
+    - STEREO_MULTIVIEW_ON
   - pass: 4
     keywords:
-    - DIRECTIONAL
-    - FOG_LINEAR
-    - LIGHTMAP_ON
+    - DIRECTIONAL LIGHTPROBE_SH
+  - pass: 5
+    keywords:
+    - DIRECTIONAL LIGHTPROBE_SH
   output: {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}

@@ -14,6 +14,7 @@ public class Variant
 public class ShaderVariantWriter : ScriptableObject
 {
 	public SceneAsset scene;
+    public List<string> additionalHiddenShaders;
 	public List<Shader> additionalShaders;
 	public List<GameObject> additionalPrefabs;
 	public List<Material> additionalMaterials;

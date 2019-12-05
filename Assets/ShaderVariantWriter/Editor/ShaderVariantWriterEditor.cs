@@ -26,6 +26,20 @@ public class ShaderVariantWriterEditor : Editor
         Debug.Assert(settings.output != null);
         ShaderVariantCollection collection = settings.output;
         HashSet<Shader> shaders = new HashSet<Shader>();
+        foreach (string shaderName in settings.additionalHiddenShaders)
+        {
+            Shader shader = Shader.Find(shaderName);
+            if (shader == null)
+            {
+                Debug.LogErrorFormat(
+                    "Could not find shader '{0}'",
+                    shaderName);
+            }
+            else if (!shaders.Contains(shader))
+            {
+                shaders.Add(shader);
+            }
+        }
         foreach (Shader shader in settings.additionalShaders)
         {
             if (!shaders.Contains(shader))
