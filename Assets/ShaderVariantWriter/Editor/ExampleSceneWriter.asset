@@ -13,6 +13,20 @@ MonoBehaviour:
   m_Name: ExampleSceneWriter
   m_EditorClassIdentifier: 
   scene: {fileID: 102900000, guid: 0a7513e9282cc4f9d9c66b0c051e1b07, type: 3}
-  additionalShaders: []
-  additionalPrefabs: []
-  additionalMaterials: []
+  additionalShaders:
+  - {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
+  - {fileID: 4800000, guid: 056454b44bd13a0478800d1855cb76de, type: 3}
+  additionalPrefabs:
+  - {fileID: 4664626616656640470, guid: aba0a5d3aafd0fb45a9726d2a46bfdd0, type: 3}
+  additionalMaterials:
+  - {fileID: 2100000, guid: 512c9a57c1b81024c843d5fcf9719864, type: 2}
+  wantedVariants:
+  - pass: 0
+    keywords:
+    - FOG_LINEAR
+  - pass: 4
+    keywords:
+    - DIRECTIONAL
+    - FOG_LINEAR
+    - LIGHTMAP_ON
+  output: {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}
