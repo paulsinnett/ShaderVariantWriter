@@ -89,11 +89,14 @@ public class ShaderVariantWriterEditor : Editor
         Shader shader,
         Variant wantedVariant)
     {
-        foreach (string keywords in wantedVariant.keywords)
+        foreach (string keywordString in wantedVariant.keywords)
         {
-            string [] keywordList = keywords.Split(new char [] {' '});
-            try
+            string [] keywordList = keywordString.Split(new char [] {' '});
+            if (CheckKeywords(shader, wantedVariant.pass, keywordList))
             {
+                List<string> keywords = new List<string>(keywordList);
+                keywords.Add("STEREO_MULTIVIEW_ON");
+
                 ShaderVariantCollection.ShaderVariant variant =
                     new ShaderVariantCollection.ShaderVariant(
                         shader,
@@ -101,16 +104,12 @@ public class ShaderVariantWriterEditor : Editor
                         new string [] {}
                     );
 
-                variant.keywords = keywordList;
+                variant.keywords = keywords.ToArray();
                 collection.Add(variant);
-            }
-            catch (System.ArgumentException)
-            {
-                Debug.LogFormat(
-                    "Shader {0} pass {1} keywords {2} not found",
-                    shader.name,
-                    wantedVariant.pass.ToString(),
-                    keywords);
+
+                keywords.Add("UNITY_SINGLE_PASS_STEREO");
+                variant.keywords = keywords.ToArray();
+                collection.Add(variant);
             }
         }
     }
