@@ -27,12 +27,11 @@ MonoBehaviour:
   wantedVariants:
   - pass: 0
     keywords:
-    - 
     - STEREO_MULTIVIEW_ON
   - pass: 4
     keywords:
-    - DIRECTIONAL LIGHTPROBE_SH
-  - pass: 5
+    - DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+  - pass: 4
     keywords:
-    - DIRECTIONAL LIGHTPROBE_SH
+    - DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
   output: {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}

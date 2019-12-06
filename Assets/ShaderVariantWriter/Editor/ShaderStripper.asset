@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   keepShaders:
   - {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}
+  keepKeywords:
+  - STEREO_INSTANCING_ON

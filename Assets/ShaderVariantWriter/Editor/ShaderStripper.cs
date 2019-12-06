@@ -11,6 +11,7 @@ using static UnityEngine.ShaderVariantCollection;
 public class ShaderStripper : ScriptableObject
 {
     public List<ShaderVariantCollection> keepShaders;
+    public List<string> keepKeywords;
 
     public class Stripper : IPreprocessShaders
     {
@@ -22,6 +23,7 @@ public class ShaderStripper : ScriptableObject
             IList<ShaderCompilerData> data)
         {
             List<ShaderVariantCollection> keepShaders = null;
+            List<string> keepKeywords = null;
             foreach (var guid in AssetDatabase.FindAssets("t:ShaderStripper"))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -29,14 +31,16 @@ public class ShaderStripper : ScriptableObject
                 if (stripper != null)
                 {
                     keepShaders = stripper.keepShaders;
+                    keepKeywords = stripper.keepKeywords;
                 }
             }
 
-            if (keepShaders == null || keepShaders.Count == 0)
+            Debug.Assert(keepShaders != null);
+            Debug.Assert(keepKeywords != null);
+            if (keepShaders.Count == 0)
             {
                 return;
             }
-
             for (int i = data.Count - 1; i >= 0; --i)
             {
                 ShaderCompilerData variant = data[i];
@@ -44,17 +48,17 @@ public class ShaderStripper : ScriptableObject
                 var variantKeywords = variant.shaderKeywordSet.GetShaderKeywords();
                 foreach (ShaderKeyword keyword in variantKeywords)
                 {
-                    keywords.Add(keyword.GetKeywordName());
+                    string k = keyword.GetKeywordName();
+                    keywords.Add(k);
                 }
 
                 bool match = false;
                 try
                 {
-                    ShaderVariant currentVariant =
-                        new ShaderVariant(
-                            shader,
-                            snippet.passType,
-                            keywords.ToArray());
+                    ShaderVariant currentVariant = new ShaderVariant();
+                    currentVariant.shader = shader;
+                    currentVariant.passType = snippet.passType;
+                    currentVariant.keywords = keywords.ToArray();
 
                     foreach (ShaderVariantCollection collection in keepShaders)
                     {
@@ -67,15 +71,18 @@ public class ShaderStripper : ScriptableObject
                 }
                 catch (System.ArgumentException)
                 {
-                    // instance not supported, carry on...
+                    // not valid, continue...
                 }
 
-                Debug.LogFormat(
-                    "{0} shader {1} pass {2} keywords {3}",
-                    match ? "Keep" : "Strip",
-                    shader.name,
-                    snippet.passType,
-                    string.Join(" ", keywords));
+                if (match)
+                {
+                    Debug.LogFormat(
+                        "{0} shader {1} pass {2} keywords {3}",
+                        match ? "Keep" : "Strip",
+                        shader.name,
+                        snippet.passType,
+                        string.Join(" ", keywords));
+                }
 
                 if (!match)
                 {

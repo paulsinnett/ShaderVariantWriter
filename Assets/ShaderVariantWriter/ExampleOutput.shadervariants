@@ -8,42 +8,49 @@ ShaderVariantCollection:
   m_PrefabAsset: {fileID: 0}
   m_Name: ExampleOutput
   m_Shaders:
-  - first: {fileID: 66, guid: 0000000000000000f000000000000000, type: 0}
+  - first: {fileID: 9002, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: 
-        passType: 0
-  - first: {fileID: 9000, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: 
-        passType: 0
-  - first: {fileID: 9001, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: 
-        passType: 0
-  - first: {fileID: 9003, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: 
-        passType: 0
-  - first: {fileID: 9004, guid: 0000000000000000f000000000000000, type: 0}
-    second:
-      variants:
-      - keywords: 
+      - keywords: STEREO_MULTIVIEW_ON
         passType: 0
   - first: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH UNITY_SINGLE_PASS_STEREO
+      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
-      - keywords: SHADOWS_DEPTH
-        passType: 8
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+  - first: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
   - first: {fileID: 10720, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: FOG_LINEAR
+      - keywords: STEREO_MULTIVIEW_ON
         passType: 0
-      - keywords: FOG_LINEAR UNITY_SINGLE_PASS_STEREO
+  - first: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: STEREO_MULTIVIEW_ON
+        passType: 0
+  - first: {fileID: 10757, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: STEREO_MULTIVIEW_ON
+        passType: 0
+  - first: {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
+    second:
+      variants:
+      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+  - first: {fileID: 4800000, guid: 056454b44bd13a0478800d1855cb76de, type: 3}
+    second:
+      variants:
+      - keywords: STEREO_MULTIVIEW_ON
         passType: 0

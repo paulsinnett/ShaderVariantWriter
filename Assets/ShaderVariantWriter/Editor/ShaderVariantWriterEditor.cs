@@ -25,6 +25,7 @@ public class ShaderVariantWriterEditor : Editor
         ShaderVariantWriter settings = target as ShaderVariantWriter;
         Debug.Assert(settings.output != null);
         ShaderVariantCollection collection = settings.output;
+        collection.Clear();
         HashSet<Shader> shaders = new HashSet<Shader>();
         foreach (string shaderName in settings.additionalHiddenShaders)
         {
@@ -87,9 +88,10 @@ public class ShaderVariantWriterEditor : Editor
                             new ShaderVariantCollection.ShaderVariant(
                                 shader,
                                 wantedVariant.pass,
-                                keywordList
+                                new string [] {}
                             );
 
+                        variant.keywords = keywordList;
                         collection.Add(variant);
                     }
                     catch (System.ArgumentException)

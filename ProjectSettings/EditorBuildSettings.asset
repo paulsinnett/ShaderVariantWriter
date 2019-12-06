@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/ShaderVariantWriter/WarmUp.unity
+    guid: baaa856a0723cdb4e8f935153d0f0f62
+  - enabled: 1
     path: Assets/ShaderVariantWriter/SampleScene.unity
     guid: 0a7513e9282cc4f9d9c66b0c051e1b07
   m_configObjects: {}
