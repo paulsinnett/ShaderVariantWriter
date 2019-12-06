@@ -79,33 +79,67 @@ public class ShaderVariantWriterEditor : Editor
         {
             foreach (Variant wantedVariant in settings.wantedVariants)
             {
-                foreach (string keywords in wantedVariant.keywords)
-                {
-                    string [] keywordList = keywords.Split(new char [] {' '});
-                    try
-                    {
-                        ShaderVariantCollection.ShaderVariant variant =
-                            new ShaderVariantCollection.ShaderVariant(
-                                shader,
-                                wantedVariant.pass,
-                                new string [] {}
-                            );
-
-                        variant.keywords = keywordList;
-                        collection.Add(variant);
-                    }
-                    catch (System.ArgumentException)
-                    {
-                        Debug.LogFormat(
-                            "Shader {0} pass {1} keywords {2} not found",
-                            shader.name,
-                            wantedVariant.pass.ToString(),
-                            keywords);
-                    }
-                }
+                AddKeywords(collection, shader, wantedVariant);
             }
         }
     }
+
+    void AddKeywords(
+        ShaderVariantCollection collection,
+        Shader shader,
+        Variant wantedVariant)
+    {
+        foreach (string keywords in wantedVariant.keywords)
+        {
+            string [] keywordList = keywords.Split(new char [] {' '});
+            try
+            {
+                ShaderVariantCollection.ShaderVariant variant =
+                    new ShaderVariantCollection.ShaderVariant(
+                        shader,
+                        wantedVariant.pass,
+                        new string [] {}
+                    );
+
+                variant.keywords = keywordList;
+                collection.Add(variant);
+            }
+            catch (System.ArgumentException)
+            {
+                Debug.LogFormat(
+                    "Shader {0} pass {1} keywords {2} not found",
+                    shader.name,
+                    wantedVariant.pass.ToString(),
+                    keywords);
+            }
+        }
+    }
+
+    bool CheckKeywords(Shader shader, PassType pass, string [] keywords)
+    {
+        bool valid = false;
+        try
+        {
+            ShaderVariantCollection.ShaderVariant variant =
+                new ShaderVariantCollection.ShaderVariant(
+                    shader,
+                    pass,
+                    keywords
+                );
+            
+            valid = true;
+        }
+        catch (System.ArgumentException)
+        {
+            Debug.LogFormat(
+                "Shader {0} pass {1} keywords {2} not found",
+                shader.name,
+                pass.ToString(),
+                keywords);
+        }
+        return valid;
+    }
+
 
     void AddObjectShaders(GameObject gameObject, HashSet<Shader> shaders)
     {
