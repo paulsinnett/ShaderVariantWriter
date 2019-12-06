@@ -27,11 +27,11 @@ MonoBehaviour:
   wantedVariants:
   - pass: 0
     keywords:
-    - 
+    - _ FOG_LINEAR
   - pass: 4
     keywords:
-    - DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH
-  - pass: 4
-    keywords:
-    - DIRECTIONAL LIGHTPROBE_SH
+    - DIRECTIONAL
+    - _ LIGHTPROBE_SH
+    - _ LIGHTMAP_ON
+    - _ FOG_LINEAR
   output: {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}

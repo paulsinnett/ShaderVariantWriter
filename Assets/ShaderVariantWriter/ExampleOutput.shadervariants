@@ -13,66 +13,84 @@ ShaderVariantCollection:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
         passType: 0
-      - keywords: STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
-        passType: 0
   - first: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
+      - keywords: DIRECTIONAL STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
+        passType: 4
       - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
   - first: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
+      - keywords: DIRECTIONAL STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
+        passType: 4
       - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
   - first: {fileID: 10720, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
         passType: 0
-      - keywords: STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
+      - keywords: FOG_LINEAR STEREO_MULTIVIEW_ON
         passType: 0
   - first: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
         passType: 0
-      - keywords: STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
-        passType: 0
   - first: {fileID: 10757, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
-        passType: 0
-      - keywords: STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
         passType: 0
   - first: {fileID: 4800000, guid: 056454b44bd13a0478800d1855cb76de, type: 3}
     second:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
         passType: 0
-      - keywords: STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
+      - keywords: FOG_LINEAR STEREO_MULTIVIEW_ON
         passType: 0
   - first: {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
     second:
       variants:
+      - keywords: DIRECTIONAL STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
+        passType: 4
       - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON UNITY_SINGLE_PASS_STEREO
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
