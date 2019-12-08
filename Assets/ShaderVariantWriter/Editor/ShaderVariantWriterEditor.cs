@@ -118,6 +118,7 @@ public class ShaderVariantWriterEditor : Editor
             }
         }
 #endif
+    }
 
     void AddMaterial(Material material)
     {
@@ -200,7 +201,7 @@ public class ShaderVariantWriterEditor : Editor
 
             variant.shader = shader;
             variant.passType = pass;
-            variant.keywords = new string [] {};
+            variant.keywords = new string[] { };
             collection.Add(variant);
         }
         if (CheckKeywords(shader, pass, keywordList))
