@@ -12,6 +12,9 @@ using PassType = UnityEngine.Rendering.PassType;
 [CustomEditor(typeof(ShaderVariantWriter))]
 public class ShaderVariantWriterEditor : Editor
 {
+    Dictionary<Shader, List<string[]>> shaderKeywords = null;
+    HashSet<Shader> shaders = null;
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -29,7 +32,8 @@ public class ShaderVariantWriterEditor : Editor
         Debug.Assert(settings.output != null);
         ShaderVariantCollection collection = settings.output;
         collection.Clear();
-        HashSet<Shader> shaders = new HashSet<Shader>();
+        shaders = new HashSet<Shader>();
+        shaderKeywords = new Dictionary<Shader, List<string[]>>();
         foreach (string shaderName in settings.additionalHiddenShaders)
         {
             Shader shader = Shader.Find(shaderName);
@@ -53,15 +57,11 @@ public class ShaderVariantWriterEditor : Editor
         }
         foreach (Material material in settings.additionalMaterials)
         {
-            Shader shader = material.shader;
-            if (shader != null && !shaders.Contains(shader))
-            {
-                shaders.Add(shader);
-            }
+            AddMaterial(material);
         }
         foreach (GameObject prefab in settings.additionalPrefabs)
         {
-            AddObjectShaders(prefab, shaders);
+            AddObjectShaders(prefab);
         }
         if (settings.scene != null)
         {
@@ -79,7 +79,7 @@ public class ShaderVariantWriterEditor : Editor
                 }
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddObjectShaders(root, shaders, exclude);
+                    AddObjectShaders(root, exclude);
                 }
             }
         }
@@ -118,6 +118,29 @@ public class ShaderVariantWriterEditor : Editor
             }
         }
 #endif
+
+    void AddMaterial(Material material)
+    {
+        Shader shader = material.shader;
+        if (shader != null)
+        {
+            if (!shaders.Contains(material.shader))
+            {
+                shaders.Add(shader);
+            }
+
+            List<string[]> list = null;
+            if (shaderKeywords.ContainsKey(shader))
+            {
+                list = shaderKeywords[shader];
+            }
+            else
+            {
+                list = new List<string[]>();
+                shaderKeywords.Add(shader, list);
+            }
+            list.Add(material.shaderKeywords);
+        }
     }
 
     void AddVariations(
@@ -229,7 +252,6 @@ public class ShaderVariantWriterEditor : Editor
 
     void AddObjectShaders(
         GameObject gameObject,
-        HashSet<Shader> shaders,
         HashSet<Renderer> exclude = null)
     {
         Renderer[] renderers = null;
@@ -249,16 +271,7 @@ public class ShaderVariantWriterEditor : Editor
             {
                 if (material != null)
                 {
-                    Shader shader = material.shader;
-                    if (shader != null && !shaders.Contains(material.shader))
-                    {
-                        Debug.LogFormat(
-                            renderer.gameObject,
-                            "adding material {0}",
-                            shader.name);
-
-                        shaders.Add(shader);
-                    }
+                    AddMaterial(material);
                 }
             }
         }
