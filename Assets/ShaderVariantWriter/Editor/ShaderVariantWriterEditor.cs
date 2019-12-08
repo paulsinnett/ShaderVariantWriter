@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿//#define EXCLUDE_MESH_BAKER
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -69,9 +72,14 @@ public class ShaderVariantWriterEditor : Editor
 
             if (scene.IsValid())
             {
+                HashSet<Renderer> exclude = new HashSet<Renderer>();
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddObjectShaders(root, shaders);
+                    AddMeshBakeRenderersToExclusionList(root, exclude);
+                }
+                foreach (GameObject root in scene.GetRootGameObjects())
+                {
+                    AddObjectShaders(root, shaders, exclude);
                 }
             }
         }
@@ -84,6 +92,34 @@ public class ShaderVariantWriterEditor : Editor
         }
     }
 
+    void AddMeshBakeRenderersToExclusionList(
+        GameObject root,
+        HashSet<Renderer> exclude)
+    {
+#if EXCLUDE_MESH_BAKER
+        MB3_TextureBaker[] bakers =
+            root.GetComponentsInChildren<MB3_TextureBaker>();
+
+        foreach (var baker in bakers)
+        {
+            if (baker.objsToMesh != null && baker.objsToMesh.Count > 0)
+            {
+                foreach (GameObject baked in baker.objsToMesh)
+                {
+                    if (baked != null)
+                    {
+                        Renderer renderer = baked.GetComponent<Renderer>();
+                        if (renderer != null)
+                        {
+                            exclude.Add(renderer);
+                        }
+                    }
+                }
+            }
+        }
+#endif
+    }
+
     void AddVariations(
         ShaderVariantCollection collection,
         Shader shader,
@@ -91,7 +127,6 @@ public class ShaderVariantWriterEditor : Editor
     {
         List<string[]> options = new List<string[]>();
         int total = 1;
-        Debug.Assert(wantedVariant.keywords.Count > 0);
         foreach (string keywordString in wantedVariant.keywords)
         {
             string[] choices = keywordString.Split(new char[] { ' ' });
@@ -109,7 +144,8 @@ public class ShaderVariantWriterEditor : Editor
                 index /= options[j].Length;
                 if (options[j][m] != "_")
                 {
-                    keywords.Add(options[j][m]);
+                    string[] subset = options[j][m].Split(new char[] { '+' });
+                    keywords.AddRange(subset);
                 }
             }
 
@@ -132,18 +168,28 @@ public class ShaderVariantWriterEditor : Editor
         PassType pass,
         string[] keywordList)
     {
+        // special case override
+        if (shader.name == "Hidden/VideoDecodeAndroid" &&
+            keywordList.Length == 0)
+        {
+            ShaderVariantCollection.ShaderVariant variant =
+                new ShaderVariantCollection.ShaderVariant();
+
+            variant.shader = shader;
+            variant.passType = pass;
+            variant.keywords = new string [] {};
+            collection.Add(variant);
+        }
         if (CheckKeywords(shader, pass, keywordList))
         {
             List<string> keywords = new List<string>(keywordList);
             keywords.Add("STEREO_MULTIVIEW_ON");
 
             ShaderVariantCollection.ShaderVariant variant =
-                new ShaderVariantCollection.ShaderVariant(
-                    shader,
-                    pass,
-                    new string[] { }
-                );
+                new ShaderVariantCollection.ShaderVariant();
 
+            variant.shader = shader;
+            variant.passType = pass;
             variant.keywords = keywords.ToArray();
             collection.Add(variant);
         }
@@ -166,21 +212,38 @@ public class ShaderVariantWriterEditor : Editor
         catch (System.ArgumentException)
         {
             // Debug.LogFormat(
-            //     "Shader {0} pass {1} keywords {2} not found",
+            //     "Shader {0} pass {1} keywords '{2}' not found",
             //     shader.name,
             //     pass.ToString(),
-            //     keywords);
+            //     string.Join(" ", keywords));
+
+            // special case override
+            if (shader.name == "Hidden/InternalErrorShader" && keywords.Length == 0)
+            {
+                valid = true;
+            }
         }
         return valid;
     }
 
 
-    void AddObjectShaders(GameObject gameObject, HashSet<Shader> shaders)
+    void AddObjectShaders(
+        GameObject gameObject,
+        HashSet<Shader> shaders,
+        HashSet<Renderer> exclude = null)
     {
         Renderer[] renderers = null;
-        renderers = gameObject.GetComponentsInChildren<Renderer>();
+        renderers = gameObject.GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
+            if (exclude != null)
+            {
+                if (exclude.Contains(renderer))
+                {
+                    continue;
+                }
+            }
+
             Material[] materials = renderer.sharedMaterials;
             foreach (Material material in materials)
             {
@@ -189,6 +252,11 @@ public class ShaderVariantWriterEditor : Editor
                     Shader shader = material.shader;
                     if (shader != null && !shaders.Contains(material.shader))
                     {
+                        Debug.LogFormat(
+                            renderer.gameObject,
+                            "adding material {0}",
+                            shader.name);
+
                         shaders.Add(shader);
                     }
                 }
