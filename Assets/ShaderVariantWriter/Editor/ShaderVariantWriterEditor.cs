@@ -12,7 +12,7 @@ using PassType = UnityEngine.Rendering.PassType;
 [CustomEditor(typeof(ShaderVariantWriter))]
 public class ShaderVariantWriterEditor : Editor
 {
-    Dictionary<Shader, List<string[]>> shaderKeywords = null;
+    Dictionary<Shader, List<HashSet<string>>> shaderKeywords = null;
     HashSet<Shader> shaders = null;
 
     public override void OnInspectorGUI()
@@ -33,7 +33,7 @@ public class ShaderVariantWriterEditor : Editor
         ShaderVariantCollection collection = settings.output;
         collection.Clear();
         shaders = new HashSet<Shader>();
-        shaderKeywords = new Dictionary<Shader, List<string[]>>();
+        shaderKeywords = new Dictionary<Shader, List<HashSet<string>>>();
         foreach (string shaderName in settings.additionalHiddenShaders)
         {
             Shader shader = Shader.Find(shaderName);
@@ -130,17 +130,33 @@ public class ShaderVariantWriterEditor : Editor
                 shaders.Add(shader);
             }
 
-            List<string[]> list = null;
-            if (shaderKeywords.ContainsKey(shader))
+            if (material.shaderKeywords.Length > 0)
             {
-                list = shaderKeywords[shader];
+                List<HashSet<string>> list = null;
+                if (shaderKeywords.ContainsKey(shader))
+                {
+                    list = shaderKeywords[shader];
+                }
+                else
+                {
+                    list = new List<HashSet<string>>();
+                    shaderKeywords.Add(shader, list);
+                }
+                var newSet = new HashSet<string>(material.shaderKeywords);
+                bool exists = false;
+                foreach (var set in list)
+                {
+                    if (newSet.SetEquals(set))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                {
+                    list.Add(newSet);
+                }
             }
-            else
-            {
-                list = new List<string[]>();
-                shaderKeywords.Add(shader, list);
-            }
-            list.Add(material.shaderKeywords);
         }
     }
 
@@ -183,6 +199,20 @@ public class ShaderVariantWriterEditor : Editor
                 shader,
                 wantedVariant.pass,
                 keywords.ToArray());
+
+            if (shaderKeywords.ContainsKey(shader))
+            {
+                foreach (var list in shaderKeywords[shader])
+                {
+                    List<string> materialKeywords = new List<string>(keywords);
+                    materialKeywords.AddRange(list);
+                    AddKeywords(
+                        collection,
+                        shader,
+                        wantedVariant.pass,
+                        materialKeywords.ToArray());
+                }
+            }
         }
     }
 
