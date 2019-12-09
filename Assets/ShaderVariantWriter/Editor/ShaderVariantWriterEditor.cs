@@ -14,6 +14,8 @@ public class ShaderVariantWriterEditor : Editor
 {
     Dictionary<Shader, List<HashSet<string>>> shaderKeywords = null;
     HashSet<Shader> shaders = null;
+    HashSet<Renderer> exclude = null;
+    HashSet<string> internalShaders = null;
 
     public override void OnInspectorGUI()
     {
@@ -33,6 +35,11 @@ public class ShaderVariantWriterEditor : Editor
         ShaderVariantCollection collection = settings.output;
         collection.Clear();
         shaders = new HashSet<Shader>();
+        exclude = new HashSet<Renderer>();
+        internalShaders = new HashSet<string>(new string[] {
+            "Hidden/InternalErrorShader",
+            "Hidden/VideoDecodeAndroid"
+        });
         shaderKeywords = new Dictionary<Shader, List<HashSet<string>>>();
         foreach (string shaderName in settings.additionalHiddenShaders)
         {
@@ -72,14 +79,13 @@ public class ShaderVariantWriterEditor : Editor
 
             if (scene.IsValid())
             {
-                HashSet<Renderer> exclude = new HashSet<Renderer>();
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddMeshBakeRenderersToExclusionList(root, exclude);
+                    AddMeshBakeRenderersToExclusionList(root);
                 }
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddObjectShaders(root, exclude);
+                    AddObjectShaders(root);
                 }
             }
         }
@@ -92,9 +98,7 @@ public class ShaderVariantWriterEditor : Editor
         }
     }
 
-    void AddMeshBakeRenderersToExclusionList(
-        GameObject root,
-        HashSet<Renderer> exclude)
+    void AddMeshBakeRenderersToExclusionList(GameObject root)
     {
 #if EXCLUDE_MESH_BAKER
         MB3_TextureBaker[] bakers =
@@ -109,6 +113,7 @@ public class ShaderVariantWriterEditor : Editor
                     if (baked != null)
                     {
                         Renderer renderer = baked.GetComponent<Renderer>();
+
                         if (renderer != null)
                         {
                             exclude.Add(renderer);
@@ -125,7 +130,7 @@ public class ShaderVariantWriterEditor : Editor
         Shader shader = material.shader;
         if (shader != null)
         {
-            if (!shaders.Contains(material.shader))
+            if (!shaders.Contains(shader))
             {
                 shaders.Add(shader);
             }
@@ -154,10 +159,10 @@ public class ShaderVariantWriterEditor : Editor
                 }
                 if (!exists)
                 {
-                    Debug.LogFormat(
-                        "adding keywords {0} from material {1}",
-                        string.Join(" ", newSet),
-                        material.name);
+                    // Debug.LogFormat(
+                    //     "adding keywords {0} from material {1}",
+                    //     string.Join(" ", newSet),
+                    //     material.name);
 
                     list.Add(newSet);
                 }
@@ -199,24 +204,27 @@ public class ShaderVariantWriterEditor : Editor
             //     i,
             //     string.Join(" ", keywords));
 
-            AddKeywords(
-                collection,
-                shader,
-                wantedVariant.pass,
-                keywords.ToArray());
-
             if (shaderKeywords.ContainsKey(shader))
             {
                 foreach (var list in shaderKeywords[shader])
                 {
                     List<string> materialKeywords = new List<string>(keywords);
                     materialKeywords.AddRange(list);
+
                     AddKeywords(
                         collection,
                         shader,
                         wantedVariant.pass,
                         materialKeywords.ToArray());
                 }
+            }
+            else
+            {
+                AddKeywords(
+                    collection,
+                    shader,
+                    wantedVariant.pass,
+                    keywords.ToArray());
             }
         }
     }
@@ -227,22 +235,14 @@ public class ShaderVariantWriterEditor : Editor
         PassType pass,
         string[] keywordList)
     {
-        // special case override
-        if (shader.name == "Hidden/VideoDecodeAndroid" &&
-            keywordList.Length == 0)
-        {
-            ShaderVariantCollection.ShaderVariant variant =
-                new ShaderVariantCollection.ShaderVariant();
-
-            variant.shader = shader;
-            variant.passType = pass;
-            variant.keywords = new string[] { };
-            collection.Add(variant);
-        }
         if (CheckKeywords(shader, pass, keywordList))
         {
             List<string> keywords = new List<string>(keywordList);
-            keywords.Add("STEREO_MULTIVIEW_ON");
+            // special case override
+            if (shader.name != "Hidden/VideoDecodeAndroid")
+            {
+                keywords.Add("STEREO_MULTIVIEW_ON");
+            }
 
             ShaderVariantCollection.ShaderVariant variant =
                 new ShaderVariantCollection.ShaderVariant();
@@ -276,8 +276,7 @@ public class ShaderVariantWriterEditor : Editor
             //     pass.ToString(),
             //     string.Join(" ", keywords));
 
-            // special case override
-            if (shader.name == "Hidden/InternalErrorShader" && keywords.Length == 0)
+            if (internalShaders.Contains(shader.name) && keywords.Length == 0)
             {
                 valid = true;
             }
@@ -285,23 +284,16 @@ public class ShaderVariantWriterEditor : Editor
         return valid;
     }
 
-
-    void AddObjectShaders(
-        GameObject gameObject,
-        HashSet<Renderer> exclude = null)
+    void AddObjectShaders(GameObject gameObject)
     {
         Renderer[] renderers = null;
         renderers = gameObject.GetComponentsInChildren<Renderer>(true);
         foreach (Renderer renderer in renderers)
         {
-            if (exclude != null)
+            if (exclude.Contains(renderer))
             {
-                if (exclude.Contains(renderer))
-                {
-                    continue;
-                }
+                continue;
             }
-
             Material[] materials = renderer.sharedMaterials;
             foreach (Material material in materials)
             {

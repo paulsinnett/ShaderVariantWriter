@@ -8,24 +8,24 @@ ShaderVariantCollection:
   m_PrefabAsset: {fileID: 0}
   m_Name: ExampleOutput
   m_Shaders:
+  - first: {fileID: 17, guid: 0000000000000000e000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: STEREO_MULTIVIEW_ON
+        passType: 0
   - first: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON _EMISSION
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON _EMISSION
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON _EMISSION
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON _EMISSION
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON _EMISSION
+        passType: 4
+  - first: {fileID: 211, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: FOG_LINEAR STEREO_MULTIVIEW_ON _ALPHABLEND_ON _COLOROVERLAY_ON
         passType: 4
   - first: {fileID: 9002, guid: 0000000000000000f000000000000000, type: 0}
     second:
@@ -35,9 +35,7 @@ ShaderVariantCollection:
   - first: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
         passType: 4
@@ -46,9 +44,7 @@ ShaderVariantCollection:
   - first: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
         passType: 4
@@ -71,6 +67,20 @@ ShaderVariantCollection:
       variants:
       - keywords: STEREO_MULTIVIEW_ON
         passType: 0
+  - first: {fileID: 16002, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
+    second:
+      variants:
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
   - first: {fileID: 4800000, guid: 056454b44bd13a0478800d1855cb76de, type: 3}
     second:
       variants:
@@ -78,14 +88,3 @@ ShaderVariantCollection:
         passType: 0
       - keywords: FOG_LINEAR STEREO_MULTIVIEW_ON
         passType: 0
-  - first: {fileID: 4800000, guid: 493203baf897e9f46bf6d6ca2da9392f, type: 3}
-    second:
-      variants:
-      - keywords: DIRECTIONAL LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL LIGHTPROBE_SH STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
-        passType: 4
-      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
-        passType: 4
