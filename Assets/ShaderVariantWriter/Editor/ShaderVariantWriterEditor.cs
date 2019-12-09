@@ -154,6 +154,11 @@ public class ShaderVariantWriterEditor : Editor
                 }
                 if (!exists)
                 {
+                    Debug.LogFormat(
+                        "adding keywords {0} from material {1}",
+                        string.Join(" ", newSet),
+                        material.name);
+
                     list.Add(newSet);
                 }
             }

@@ -31,9 +31,6 @@ MonoBehaviour:
   - pass: 4
     keywords:
     - DIRECTIONAL
-    - _ LIGHTPROBE_SH
-    - _ LIGHTMAP_ON
+    - LIGHTPROBE_SH LIGHTMAP_ON
     - _ FOG_LINEAR
-  - pass: 0
-    keywords: []
   output: {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}
