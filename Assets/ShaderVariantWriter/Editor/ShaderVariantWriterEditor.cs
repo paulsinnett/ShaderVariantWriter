@@ -329,56 +329,107 @@ public class ShaderVariantWriterEditor : Editor
 
     void AddObjectShaders(GameObject gameObject)
     {
-        Renderer[] renderers = null;
-        renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-        foreach (Renderer renderer in renderers)
+        var components = gameObject.GetComponentsInChildren<Component>(true);
+        foreach (var component in components)
         {
-            if (exclude.Contains(renderer))
+            var renderer = component as Renderer;
+            var image = component as Image;
+            if (renderer != null)
             {
-                if (renderer.gameObject.name == "LockGamePacmanCasing")
+                if (exclude.Contains(renderer))
                 {
-                    Debug.LogFormat(
-                        renderer.gameObject,
-                        "excluding object {0}",
-                        renderer.name);
+                    // if (renderer.gameObject.name == "LockGamePacmanCasing")
+                    // {
+                    //     Debug.LogFormat(
+                    //         renderer.gameObject,
+                    //         "excluding object {0}",
+                    //         renderer.name);
+                    // }
+                    continue;
                 }
-                continue;
+                Material[] materials = renderer.sharedMaterials;
+                foreach (Material material in materials)
+                {
+                    if (material != null)
+                    {
+                        // if (material.shader != null &&
+                        //     material.shader.name.StartsWith("Who/"))
+                        // {
+                        //     Debug.LogFormat(
+                        //         renderer.gameObject,
+                        //         "adding shader {0} from material {1}",
+                        //         material.shader.name,
+                        //         material.name);
+                        // }
+                        // if (gameObject.name == "LockGamePacmanCasing")
+                        // {
+                        //     Debug.LogFormat(
+                        //         renderer.gameObject,
+                        //         "adding material {0} from object {1}",
+                        //         material.name,
+                        //         renderer.name);
+                        // }
+                        AddMaterial(material);
+                    }
+                }
             }
-            Material[] materials = renderer.sharedMaterials;
-            foreach (Material material in materials)
+            else if (image != null)
             {
-                if (material != null)
-                {
-                    if (material.shader != null &&
-                        material.shader.name.StartsWith("Who/"))
-                    {
-                        Debug.LogFormat(
-                            renderer.gameObject,
-                            "adding shader {0} from material {1}",
-                            material.shader.name,
-                            material.name);
-                    }
-                    if (gameObject.name == "LockGamePacmanCasing")
-                    {
-                        Debug.LogFormat(
-                            renderer.gameObject,
-                            "adding material {0} from object {1}",
-                            material.name,
-                            renderer.name);
-                    }
-                    AddMaterial(material);
-                }
-            }
-        }
-        foreach (Image image in gameObject.GetComponentsInChildren<Image>(true))
-        {
-            Debug.LogFormat(
-                gameObject,
-                "adding material {0} from object {1}",
-                image.material.name,
-                gameObject.name);
+                Debug.LogFormat(
+                    gameObject,
+                    "adding material {0} from object {1}",
+                    image.material.name,
+                    gameObject.name);
 
-            AddMaterial(image.material);
+                AddMaterial(image.material);
+            }
+            else
+            {
+                AddNonSceneObjects(new SerializedObject(component));
+            }
         }
+    }
+
+    void AddNonSceneObjects(SerializedObject serializedObject)
+    {
+        var property = serializedObject.GetIterator();
+        do
+        {
+            if (property.name != "m_GameObject" &&
+                property.propertyType ==
+                    SerializedPropertyType.ObjectReference &&
+                property.objectReferenceValue != null)
+            {
+                Type type = property.objectReferenceValue.GetType();
+
+                int reference =
+                    property.objectReferenceValue.GetInstanceID();
+
+                GameObject referencedObject = null;
+                if (type == typeof(GameObject))
+                {
+                    referencedObject =
+                        (GameObject)property.objectReferenceValue;
+                }
+                else if (type.IsSubclassOf(typeof(Component)))
+                {
+                    var component = (Component)property.objectReferenceValue;
+                    reference = component.gameObject.GetInstanceID();
+                    referencedObject = component.gameObject;
+                }
+                if (referencedObject != null &&
+                    !referencedObject.scene.IsValid())
+                {
+                    // Debug.LogFormat(
+                    //     referencedObject,
+                    //     "Recurse into {0} from {1}",
+                    //     referencedObject.name,
+                    //     serializedObject.targetObject.name);
+                    
+                    AddObjectShaders(referencedObject);
+                }
+            }
+        }
+        while (property.Next(true));
     }
 }

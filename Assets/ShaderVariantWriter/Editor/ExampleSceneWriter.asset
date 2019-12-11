@@ -22,8 +22,7 @@ MonoBehaviour:
   - {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 10757, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 16002, guid: 0000000000000000f000000000000000, type: 0}
-  additionalPrefabs:
-  - {fileID: 4664626616656640470, guid: aba0a5d3aafd0fb45a9726d2a46bfdd0, type: 3}
+  additionalPrefabs: []
   additionalMaterials:
   - {fileID: 2100000, guid: 512c9a57c1b81024c843d5fcf9719864, type: 2}
   wantedVariants:
