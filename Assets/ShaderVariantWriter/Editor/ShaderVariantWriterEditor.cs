@@ -332,6 +332,8 @@ public class ShaderVariantWriterEditor : Editor
         var components = gameObject.GetComponentsInChildren<Component>(true);
         foreach (var component in components)
         {
+            if (component == null) continue;
+            
             var renderer = component as Renderer;
             var image = component as Image;
             if (renderer != null)
@@ -383,15 +385,18 @@ public class ShaderVariantWriterEditor : Editor
 
                 AddMaterial(image.material);
             }
-            else
+            else if (!component.GetType().IsSubclassOf(typeof(Transform))
+                && component.GetType() != typeof(Transform))
             {
-                AddNonSceneObjects(new SerializedObject(component));
+                AddNonSceneObjects(component);
             }
         }
     }
 
-    void AddNonSceneObjects(SerializedObject serializedObject)
+    void AddNonSceneObjects(Component source)
     {
+        var transform = source.transform;
+        var serializedObject = new SerializedObject(source);
         var property = serializedObject.GetIterator();
         do
         {
@@ -418,13 +423,14 @@ public class ShaderVariantWriterEditor : Editor
                     referencedObject = component.gameObject;
                 }
                 if (referencedObject != null &&
-                    !referencedObject.scene.IsValid())
+                    !referencedObject.scene.IsValid() &&
+                    !transform.IsChildOf(referencedObject.transform))
                 {
-                    // Debug.LogFormat(
-                    //     referencedObject,
-                    //     "Recurse into {0} from {1}",
-                    //     referencedObject.name,
-                    //     serializedObject.targetObject.name);
+                    Debug.LogFormat(
+                        referencedObject,
+                        "Recurse into {0} from {1}",
+                        referencedObject.name,
+                        serializedObject.targetObject.name);
                     
                     AddObjectShaders(referencedObject);
                 }
