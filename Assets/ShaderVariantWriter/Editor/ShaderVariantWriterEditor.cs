@@ -286,22 +286,72 @@ public class ShaderVariantWriterEditor : Editor
 
     void AddObjectShaders(GameObject gameObject)
     {
-        Renderer[] renderers = null;
-        renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-        foreach (Renderer renderer in renderers)
+        var components = gameObject.GetComponentsInChildren<Component>(true);
+        foreach (var component in components)
         {
-            if (exclude.Contains(renderer))
+            var renderer = component as Renderer;
+            if (renderer != null)
             {
-                continue;
-            }
-            Material[] materials = renderer.sharedMaterials;
-            foreach (Material material in materials)
-            {
-                if (material != null)
+                if (exclude.Contains(renderer))
                 {
-                    AddMaterial(material);
+                    continue;
+                }
+                Material[] materials = renderer.sharedMaterials;
+                foreach (Material material in materials)
+                {
+                    if (material != null)
+                    {
+                        AddMaterial(material);
+                    }
+                }
+            }
+            else
+            {
+                AddNonSceneObjects(new SerializedObject(component));
+            }
+        }
+    }
+
+    void AddNonSceneObjects(SerializedObject serializedObject)
+    {
+        var property = serializedObject.GetIterator();
+        do
+        {
+            if (property.name != "m_GameObject" &&
+                property.propertyType ==
+                    SerializedPropertyType.ObjectReference &&
+                property.objectReferenceValue != null)
+            {
+                Type type = property.objectReferenceValue.GetType();
+
+                int reference =
+                    property.objectReferenceValue.GetInstanceID();
+
+                GameObject referencedObject = null;
+                if (type == typeof(GameObject))
+                {
+                    referencedObject =
+                        (GameObject)property.objectReferenceValue;
+                }
+                else if (type.IsSubclassOf(typeof(Component)))
+                {
+                    var component = (Component)property.objectReferenceValue;
+                    reference = component.gameObject.GetInstanceID();
+                    referencedObject = component.gameObject;
+                }
+                if (referencedObject != null &&
+                    !referencedObject.scene.IsValid())
+                {
+                    // Debug.LogFormat(
+                    //     referencedObject,
+                    //     "Recurse into {0} from {1}",
+                    //     referencedObject.name,
+                    //     serializedObject.targetObject.name);
+                    
+                    AddObjectShaders(referencedObject);
                 }
             }
         }
+        while (property.Next(true));
     }
 }
