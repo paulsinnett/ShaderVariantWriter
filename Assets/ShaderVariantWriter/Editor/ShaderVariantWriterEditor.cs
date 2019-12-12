@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using PassType = UnityEngine.Rendering.PassType;
 
 [CustomEditor(typeof(ShaderVariantWriter))]
@@ -25,6 +27,50 @@ public class ShaderVariantWriterEditor : Editor
         {
             Write();
             AssetDatabase.SaveAssets();
+        }
+        if (GUILayout.Button("Output materials"))
+        {
+            for (int i = 0; i < SceneManager.sceneCount; ++i)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.IsValid())
+                {
+                    foreach (var root in scene.GetRootGameObjects())
+                    {
+                        foreach (var renderer in
+                            root.GetComponentsInChildren<Renderer>())
+                        {
+                            foreach (var material in
+                                renderer.sharedMaterials)
+                            {
+                                if (material == null) continue;
+
+                                var keywords = new List<string>();
+                                if (material.shaderKeywords != null)
+                                {
+                                    keywords.AddRange(
+                                        material.shaderKeywords);
+                                }
+
+                                if (renderer.shadowCastingMode ==
+                                        ShadowCastingMode.On ||
+                                    renderer.shadowCastingMode ==
+                                        ShadowCastingMode.TwoSided)
+                                {
+                                    Debug.LogFormat(
+                                        renderer.gameObject,
+                                        "{0} uses shadow casting mode {1} shader {2} '{3}'",
+                                        renderer.name,
+                                        renderer.shadowCastingMode,
+                                        material.shader.name,
+                                        string.Join(" ", keywords));
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
         }
     }
 
@@ -102,7 +148,7 @@ public class ShaderVariantWriterEditor : Editor
     {
 #if EXCLUDE_MESH_BAKER
         MB3_TextureBaker[] bakers =
-            root.GetComponentsInChildren<MB3_TextureBaker>();
+            root.GetComponentsInChildren<MB3_TextureBaker>(true);
 
         foreach (var baker in bakers)
         {
@@ -113,11 +159,7 @@ public class ShaderVariantWriterEditor : Editor
                     if (baked != null)
                     {
                         Renderer renderer = baked.GetComponent<Renderer>();
-
-                        if (renderer != null)
-                        {
-                            exclude.Add(renderer);
-                        }
+                        exclude.Add(renderer);
                     }
                 }
             }
@@ -145,6 +187,7 @@ public class ShaderVariantWriterEditor : Editor
                 else
                 {
                     list = new List<HashSet<string>>();
+                    list.Add(new HashSet<string>()); // always add the empty set
                     shaderKeywords.Add(shader, list);
                 }
                 var newSet = new HashSet<string>(material.shaderKeywords);
@@ -239,7 +282,7 @@ public class ShaderVariantWriterEditor : Editor
         {
             List<string> keywords = new List<string>(keywordList);
             // special case override
-            if (shader.name != "Hidden/VideoDecodeAndroid")
+            if (shader.name != "Hidden/VideoDecodeAndroid" && !keywords.Contains("SHADOWS_DEPTH"))
             {
                 keywords.Add("STEREO_MULTIVIEW_ON");
             }
@@ -289,11 +332,21 @@ public class ShaderVariantWriterEditor : Editor
         var components = gameObject.GetComponentsInChildren<Component>(true);
         foreach (var component in components)
         {
+            if (component == null) continue;
+            
             var renderer = component as Renderer;
+            var image = component as Image;
             if (renderer != null)
             {
                 if (exclude.Contains(renderer))
                 {
+                    // if (renderer.gameObject.name == "LockGamePacmanCasing")
+                    // {
+                    //     Debug.LogFormat(
+                    //         renderer.gameObject,
+                    //         "excluding object {0}",
+                    //         renderer.name);
+                    // }
                     continue;
                 }
                 Material[] materials = renderer.sharedMaterials;
@@ -301,19 +354,49 @@ public class ShaderVariantWriterEditor : Editor
                 {
                     if (material != null)
                     {
+                        // if (material.shader != null &&
+                        //     material.shader.name.StartsWith("Who/"))
+                        // {
+                        //     Debug.LogFormat(
+                        //         renderer.gameObject,
+                        //         "adding shader {0} from material {1}",
+                        //         material.shader.name,
+                        //         material.name);
+                        // }
+                        // if (gameObject.name == "LockGamePacmanCasing")
+                        // {
+                        //     Debug.LogFormat(
+                        //         renderer.gameObject,
+                        //         "adding material {0} from object {1}",
+                        //         material.name,
+                        //         renderer.name);
+                        // }
                         AddMaterial(material);
                     }
                 }
             }
-            else
+            else if (image != null)
             {
-                AddNonSceneObjects(new SerializedObject(component));
+                Debug.LogFormat(
+                    gameObject,
+                    "adding material {0} from object {1}",
+                    image.material.name,
+                    gameObject.name);
+
+                AddMaterial(image.material);
+            }
+            else if (!component.GetType().IsSubclassOf(typeof(Transform))
+                && component.GetType() != typeof(Transform))
+            {
+                AddNonSceneObjects(component);
             }
         }
     }
 
-    void AddNonSceneObjects(SerializedObject serializedObject)
+    void AddNonSceneObjects(Component source)
     {
+        var transform = source.transform;
+        var serializedObject = new SerializedObject(source);
         var property = serializedObject.GetIterator();
         do
         {
@@ -340,13 +423,14 @@ public class ShaderVariantWriterEditor : Editor
                     referencedObject = component.gameObject;
                 }
                 if (referencedObject != null &&
-                    !referencedObject.scene.IsValid())
+                    !referencedObject.scene.IsValid() &&
+                    !transform.IsChildOf(referencedObject.transform))
                 {
-                    // Debug.LogFormat(
-                    //     referencedObject,
-                    //     "Recurse into {0} from {1}",
-                    //     referencedObject.name,
-                    //     serializedObject.targetObject.name);
+                    Debug.LogFormat(
+                        referencedObject,
+                        "Recurse into {0} from {1}",
+                        referencedObject.name,
+                        serializedObject.targetObject.name);
                     
                     AddObjectShaders(referencedObject);
                 }
