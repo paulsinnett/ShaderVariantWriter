@@ -21,6 +21,7 @@ public class ShaderVariantWriterEditor : Editor
     HashSet<Renderer> exclude = null;
     HashSet<string> internalShaders = null;
     StreamWriter file = null;
+    HashSet<GameObject> seenObjects = null;
 
     public override void OnInspectorGUI()
     {
@@ -86,6 +87,7 @@ public class ShaderVariantWriterEditor : Editor
         collection.Clear();
         shaders = new Dictionary<Shader, List<string>>();
         exclude = new HashSet<Renderer>();
+        seenObjects = new HashSet<GameObject>();
         internalShaders = new HashSet<string>(new string[] {
             "Hidden/InternalErrorShader",
             "Hidden/VideoDecodeAndroid",
@@ -382,6 +384,8 @@ public class ShaderVariantWriterEditor : Editor
 
     void AddObjectShaders(GameObject gameObject, string source)
     {
+        if (seenObjects.Contains(gameObject)) return;
+        seenObjects.Add(gameObject);
         var components = gameObject.GetComponentsInChildren<Component>(true);
         foreach (var component in components)
         {
