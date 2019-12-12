@@ -1,8 +1,9 @@
-﻿#define EXCLUDE_MESH_BAKER
+﻿//#define EXCLUDE_MESH_BAKER
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -128,7 +129,7 @@ public class ShaderVariantWriterEditor : Editor
                 }
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddObjectShaders(root, root.name);
+                    AddObjectShaders(root, "scene object");
                 }
             }
         }
@@ -220,6 +221,31 @@ public class ShaderVariantWriterEditor : Editor
         }
     }
 
+    string ObjectPath(GameObject gameObject)
+    {
+        StringBuilder path = new StringBuilder();
+        path.Append(gameObject.name);
+        PrependParent(gameObject.transform, path);
+        return path.ToString();
+    }
+
+    void PrependParent(Transform transform, StringBuilder path)
+    {
+        if (transform.parent != null)
+        {
+            path.Insert(
+                0,
+                string.Format(
+                    "{0}/",
+                    transform.parent.name,
+                    path));
+
+            PrependParent(transform.parent, path);
+        }
+    }
+
+
+
     void AddVariations(
         ShaderVariantCollection collection,
         Shader shader,
@@ -281,7 +307,7 @@ public class ShaderVariantWriterEditor : Editor
         foreach (var source in sources)
         {
             Debug.LogFormat(
-                "shader {0} from {1}",
+                "shader '{0}' from {1}",
                 shader.name,
                 source);
         }
@@ -386,7 +412,15 @@ public class ShaderVariantWriterEditor : Editor
                         //         material.name,
                         //         renderer.name);
                         // }
-                        AddMaterial(material);
+                        AddMaterial(
+                            material,
+                            string.Format(
+                                "{0} using material '{1}'",
+                                string.Format(
+                                    "{0} '{1}'",
+                                    source,
+                                    ObjectPath(renderer.gameObject)),
+                                material.name));
                     }
                 }
             }
@@ -398,14 +432,26 @@ public class ShaderVariantWriterEditor : Editor
                     image.material.name,
                     gameObject.name);
 
-                AddMaterial(image.material);
+                AddMaterial(
+                    image.material,
+                    string.Format(
+                        "{0} using material '{1}'",
+                        string.Format(
+                            "{0} '{1}'",
+                            source,
+                            ObjectPath(renderer.gameObject)),
+                        image.material.name));
             }
             else if (!component.GetType().IsSubclassOf(typeof(Transform))
                 && component.GetType() != typeof(Transform))
             {
                 AddNonSceneObjects(
                     component,
-                    source);
+                    string.Format(
+                        "{0} '{1}' component '{2}'",
+                        source,
+                        ObjectPath(component.gameObject),
+                        component.GetType().ToString()));
             }
         }
     }
@@ -447,10 +493,8 @@ public class ShaderVariantWriterEditor : Editor
                 {
                     AddObjectShaders(
                         referencedObject,
-                        string.Format(
-                            "{0} references {1}",
-                            source,
-                            referencedObject.name));
+                        string.Format("{0} referencing",
+                            source));
                 }
             }
         }
