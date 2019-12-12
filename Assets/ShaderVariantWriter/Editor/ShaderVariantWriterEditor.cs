@@ -15,7 +15,7 @@ using PassType = UnityEngine.Rendering.PassType;
 public class ShaderVariantWriterEditor : Editor
 {
     Dictionary<Shader, List<HashSet<string>>> shaderKeywords = null;
-    HashSet<Shader> shaders = null;
+    Dictionary<Shader, List<string>> shaders = null;
     HashSet<Renderer> exclude = null;
     HashSet<string> internalShaders = null;
 
@@ -80,7 +80,7 @@ public class ShaderVariantWriterEditor : Editor
         Debug.Assert(settings.output != null);
         ShaderVariantCollection collection = settings.output;
         collection.Clear();
-        shaders = new HashSet<Shader>();
+        shaders = new Dictionary<Shader, List<string>>();
         exclude = new HashSet<Renderer>();
         internalShaders = new HashSet<string>(new string[] {
             "Hidden/InternalErrorShader",
@@ -96,25 +96,22 @@ public class ShaderVariantWriterEditor : Editor
                     "Could not find shader '{0}'",
                     shaderName);
             }
-            else if (!shaders.Contains(shader))
+            else
             {
-                shaders.Add(shader);
+                AddShader(shader, "additional hidden shaders");
             }
         }
         foreach (Shader shader in settings.additionalShaders)
         {
-            if (!shaders.Contains(shader))
-            {
-                shaders.Add(shader);
-            }
+            AddShader(shader, "additional shaders");
         }
         foreach (Material material in settings.additionalMaterials)
         {
-            AddMaterial(material);
+            AddMaterial(material, "additional materials");
         }
         foreach (GameObject prefab in settings.additionalPrefabs)
         {
-            AddObjectShaders(prefab);
+            AddObjectShaders(prefab, "additional prefabs");
         }
         if (settings.scene != null)
         {
@@ -131,16 +128,30 @@ public class ShaderVariantWriterEditor : Editor
                 }
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    AddObjectShaders(root);
+                    AddObjectShaders(root, root.name);
                 }
             }
         }
-        foreach (Shader shader in shaders)
+        foreach (var entry in shaders)
         {
             foreach (Variant wantedVariant in settings.wantedVariants)
             {
-                AddVariations(collection, shader, wantedVariant);
+                AddVariations(collection, entry.Key, wantedVariant, entry.Value);
             }
+        }
+    }
+
+    void AddShader(Shader shader, string source)
+    {
+        if (shaders.ContainsKey(shader))
+        {
+            shaders[shader].Add(source);
+        }
+        else
+        {
+            List<string> sources = new List<string>();
+            sources.Add(source);
+            shaders.Add(shader, sources);
         }
     }
 
@@ -167,16 +178,12 @@ public class ShaderVariantWriterEditor : Editor
 #endif
     }
 
-    void AddMaterial(Material material)
+    void AddMaterial(Material material, string source)
     {
         Shader shader = material.shader;
         if (shader != null)
         {
-            if (!shaders.Contains(shader))
-            {
-                shaders.Add(shader);
-            }
-
+            AddShader(shader, source);
             if (material.shaderKeywords.Length > 0)
             {
                 List<HashSet<string>> list = null;
@@ -216,7 +223,8 @@ public class ShaderVariantWriterEditor : Editor
     void AddVariations(
         ShaderVariantCollection collection,
         Shader shader,
-        Variant wantedVariant)
+        Variant wantedVariant,
+        List<string> sources)
     {
         List<string[]> options = new List<string[]>();
         int total = 1;
@@ -269,6 +277,13 @@ public class ShaderVariantWriterEditor : Editor
                     wantedVariant.pass,
                     keywords.ToArray());
             }
+        }
+        foreach (var source in sources)
+        {
+            Debug.LogFormat(
+                "shader {0} from {1}",
+                shader.name,
+                source);
         }
     }
 
@@ -327,7 +342,7 @@ public class ShaderVariantWriterEditor : Editor
         return valid;
     }
 
-    void AddObjectShaders(GameObject gameObject)
+    void AddObjectShaders(GameObject gameObject, string source)
     {
         var components = gameObject.GetComponentsInChildren<Component>(true);
         foreach (var component in components)
@@ -388,15 +403,19 @@ public class ShaderVariantWriterEditor : Editor
             else if (!component.GetType().IsSubclassOf(typeof(Transform))
                 && component.GetType() != typeof(Transform))
             {
-                AddNonSceneObjects(component);
+                AddNonSceneObjects(
+                    component,
+                    source);
             }
         }
     }
 
-    void AddNonSceneObjects(Component source)
+    void AddNonSceneObjects(
+        Component sourceComponent,
+        string source)
     {
-        var transform = source.transform;
-        var serializedObject = new SerializedObject(source);
+        var transform = sourceComponent.transform;
+        var serializedObject = new SerializedObject(sourceComponent);
         var property = serializedObject.GetIterator();
         do
         {
@@ -426,13 +445,12 @@ public class ShaderVariantWriterEditor : Editor
                     !referencedObject.scene.IsValid() &&
                     !transform.IsChildOf(referencedObject.transform))
                 {
-                    Debug.LogFormat(
+                    AddObjectShaders(
                         referencedObject,
-                        "Recurse into {0} from {1}",
-                        referencedObject.name,
-                        serializedObject.targetObject.name);
-                    
-                    AddObjectShaders(referencedObject);
+                        string.Format(
+                            "{0} references {1}",
+                            source,
+                            referencedObject.name));
                 }
             }
         }
