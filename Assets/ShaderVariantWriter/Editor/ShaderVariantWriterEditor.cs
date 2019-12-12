@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -19,6 +20,7 @@ public class ShaderVariantWriterEditor : Editor
     Dictionary<Shader, List<string>> shaders = null;
     HashSet<Renderer> exclude = null;
     HashSet<string> internalShaders = null;
+    StreamWriter file = null;
 
     public override void OnInspectorGUI()
     {
@@ -77,6 +79,7 @@ public class ShaderVariantWriterEditor : Editor
 
     void Write()
     {
+        file = new StreamWriter("ShaderSources.txt");
         ShaderVariantWriter settings = target as ShaderVariantWriter;
         Debug.Assert(settings.output != null);
         ShaderVariantCollection collection = settings.output;
@@ -85,7 +88,8 @@ public class ShaderVariantWriterEditor : Editor
         exclude = new HashSet<Renderer>();
         internalShaders = new HashSet<string>(new string[] {
             "Hidden/InternalErrorShader",
-            "Hidden/VideoDecodeAndroid"
+            "Hidden/VideoDecodeAndroid",
+            "GUI/Text Shader"
         });
         shaderKeywords = new Dictionary<Shader, List<HashSet<string>>>();
         foreach (string shaderName in settings.additionalHiddenShaders)
@@ -140,6 +144,8 @@ public class ShaderVariantWriterEditor : Editor
                 AddVariations(collection, entry.Key, wantedVariant, entry.Value);
             }
         }
+        file.Close();
+        file = null;
     }
 
     void AddShader(Shader shader, string source)
@@ -306,10 +312,13 @@ public class ShaderVariantWriterEditor : Editor
         }
         foreach (var source in sources)
         {
-            Debug.LogFormat(
-                "shader '{0}' from {1}",
-                shader.name,
-                source);
+            string logLine = 
+                string.Format(
+                    "shader '{0}' from {1}",
+                    shader.name,
+                    source);
+
+            file.WriteLine(logLine);
         }
     }
 
@@ -354,11 +363,14 @@ public class ShaderVariantWriterEditor : Editor
         }
         catch (System.ArgumentException)
         {
-            // Debug.LogFormat(
-            //     "Shader {0} pass {1} keywords '{2}' not found",
-            //     shader.name,
-            //     pass.ToString(),
-            //     string.Join(" ", keywords));
+            // if (shader.name == "GUI/Text Shader")
+            // {
+            //     Debug.LogFormat(
+            //         "Shader {0} pass {1} keywords '{2}' not found",
+            //         shader.name,
+            //         pass.ToString(),
+            //         string.Join(" ", keywords));
+            // }
 
             if (internalShaders.Contains(shader.name) && keywords.Length == 0)
             {
@@ -426,12 +438,6 @@ public class ShaderVariantWriterEditor : Editor
             }
             else if (image != null)
             {
-                Debug.LogFormat(
-                    gameObject,
-                    "adding material {0} from object {1}",
-                    image.material.name,
-                    gameObject.name);
-
                 AddMaterial(
                     image.material,
                     string.Format(
