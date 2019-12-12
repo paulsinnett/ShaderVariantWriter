@@ -22,6 +22,20 @@ ShaderVariantCollection:
         passType: 4
       - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
         passType: 4
+  - first: {fileID: 11, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: DIRECTIONAL FOG_LINEAR STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTMAP_ON STEREO_MULTIVIEW_ON
+        passType: 4
+      - keywords: DIRECTIONAL FOG_LINEAR LIGHTPROBE_SH STEREO_MULTIVIEW_ON
+        passType: 4
+  - first: {fileID: 207, guid: 0000000000000000f000000000000000, type: 0}
+    second:
+      variants:
+      - keywords: STEREO_MULTIVIEW_ON
+        passType: 0
   - first: {fileID: 9002, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:

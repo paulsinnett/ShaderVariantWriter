@@ -10,6 +10,7 @@ using static UnityEngine.ShaderVariantCollection;
 [CreateAssetMenu()]
 public class ShaderStripper : ScriptableObject
 {
+    public bool enabled = true;
     public List<ShaderVariantCollection> keepShaders;
     public List<string> keepKeywords;
 
@@ -30,6 +31,7 @@ public class ShaderStripper : ScriptableObject
                 ShaderStripper stripper = AssetDatabase.LoadAssetAtPath<ShaderStripper>(path);
                 if (stripper != null)
                 {
+                    if (!stripper.enabled) return;
                     keepShaders = stripper.keepShaders;
                     keepKeywords = stripper.keepKeywords;
                 }
@@ -74,15 +76,12 @@ public class ShaderStripper : ScriptableObject
                     // not valid, continue...
                 }
 
-                if (match)
-                {
-                    Debug.LogFormat(
-                        "{0} shader {1} pass {2} keywords {3}",
-                        match ? "Keep" : "Strip",
-                        shader.name,
-                        snippet.passType,
-                        string.Join(" ", keywords));
-                }
+                Debug.LogFormat(
+                    "{0} shader {1} pass {2} keywords {3}",
+                    match ? "Keep" : "Strip",
+                    shader.name,
+                    snippet.passType,
+                    string.Join(" ", keywords));
 
                 if (!match)
                 {
