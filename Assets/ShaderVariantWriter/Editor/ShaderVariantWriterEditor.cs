@@ -439,7 +439,7 @@ public class ShaderVariantWriterEditor : Editor
                         string.Format(
                             "{0} '{1}'",
                             source,
-                            ObjectPath(renderer.gameObject)),
+                            ObjectPath(image.gameObject)),
                         image.material.name));
             }
             else if (!component.GetType().IsSubclassOf(typeof(Transform))
