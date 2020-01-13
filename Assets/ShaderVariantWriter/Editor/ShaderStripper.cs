@@ -12,7 +12,6 @@ public class ShaderStripper : ScriptableObject
 {
     public bool enabled = true;
     public List<ShaderVariantCollection> keepShaders;
-    public List<string> keepKeywords;
 
     public class Stripper : IPreprocessShaders
     {
@@ -24,7 +23,6 @@ public class ShaderStripper : ScriptableObject
             IList<ShaderCompilerData> data)
         {
             List<ShaderVariantCollection> keepShaders = null;
-            List<string> keepKeywords = null;
             foreach (var guid in AssetDatabase.FindAssets("t:ShaderStripper"))
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -33,12 +31,10 @@ public class ShaderStripper : ScriptableObject
                 {
                     if (!stripper.enabled) return;
                     keepShaders = stripper.keepShaders;
-                    keepKeywords = stripper.keepKeywords;
                 }
             }
 
             Debug.Assert(keepShaders != null);
-            Debug.Assert(keepKeywords != null);
             if (keepShaders.Count == 0)
             {
                 return;

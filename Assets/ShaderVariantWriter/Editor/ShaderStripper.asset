@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35fc3c9a440f3d243beb90ed6e323f07, type: 3}
   m_Name: ShaderStripper
   m_EditorClassIdentifier: 
+  enabled: 1
   keepShaders:
   - {fileID: 20000000, guid: 447221d757a4c49acb6598876e4260ff, type: 2}
-  keepKeywords:
-  - STEREO_INSTANCING_ON
