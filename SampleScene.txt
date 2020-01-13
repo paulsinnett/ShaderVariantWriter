@@ -1,0 +1,28 @@
+shader 'Hidden/Internal-GUITexture' from additional hidden shaders
+shader 'Hidden/Internal-GUITexture' from additional hidden shaders
+shader 'Hidden/InternalErrorShader' from additional hidden shaders
+shader 'Hidden/InternalErrorShader' from additional hidden shaders
+shader 'Custom/CustomSurface' from additional shaders
+shader 'Custom/CustomSurface' from additional shaders
+shader 'Unlit/CustomShader' from additional shaders
+shader 'Unlit/CustomShader' from additional shaders
+shader 'Sprites/Default' from additional shaders
+shader 'Sprites/Default' from additional shaders
+shader 'Sprites/Mask' from additional shaders
+shader 'Sprites/Mask' from additional shaders
+shader 'Hidden/VideoDecodeAndroid' from additional shaders
+shader 'Hidden/VideoDecodeAndroid' from additional shaders
+shader 'Mobile/Bumped Diffuse' from additional materials
+shader 'Mobile/Bumped Diffuse' from additional materials
+shader 'Standard' from scene object 'Sphere' using material 'SceneMaterial'
+shader 'Standard' from scene object 'Plane' using material 'SceneMaterial'
+shader 'Standard' from scene object 'Sphere' using material 'SceneMaterial'
+shader 'Standard' from scene object 'Plane' using material 'SceneMaterial'
+shader 'Mobile/Diffuse' from scene object 'Sphere' component 'CreateInstance' referencing 'Prefab' using material 'PrefabMaterial'
+shader 'Mobile/Diffuse' from scene object 'Sphere' component 'CreateInstance' referencing 'Prefab' component 'CreateInstance' referencing 'NestedPrefab' using material 'PrefabMaterial'
+shader 'Mobile/Diffuse' from scene object 'Sphere' component 'CreateInstance' referencing 'Prefab' using material 'PrefabMaterial'
+shader 'Mobile/Diffuse' from scene object 'Sphere' component 'CreateInstance' referencing 'Prefab' component 'CreateInstance' referencing 'NestedPrefab' using material 'PrefabMaterial'
+shader 'Legacy Shaders/Self-Illumin/Bumped Diffuse' from scene object 'Quad' using material 'Emission'
+shader 'Legacy Shaders/Self-Illumin/Bumped Diffuse' from scene object 'Quad' using material 'Emission'
+shader 'Legacy Shaders/Particles/Alpha Blended Premultiply' from scene object 'Particle' using material 'Particle'
+shader 'Legacy Shaders/Particles/Alpha Blended Premultiply' from scene object 'Particle' using material 'Particle'
